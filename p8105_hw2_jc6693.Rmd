@@ -1,0 +1,15 @@
+---
+title: 'p8105_hw2_jc6693'
+author: 'Jingfeng Cao'
+output: github_document
+---
+
+## Problem 1
+
+
+
+
+
+
+
+
