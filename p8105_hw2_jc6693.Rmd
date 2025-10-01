@@ -66,7 +66,7 @@ mr_trash_wheel_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet 
   select(-...15,-...16) |>
   janitor::clean_names() |>
   head(-1) |>
-  drop_na() |>
+  mutate(across(everything(), ~replace_na(.x, 0))) |>
   mutate(sports_balls = as.integer(round(sports_balls)))
 mr_trash_wheel_df
 ```
@@ -75,11 +75,13 @@ import Professor Trash Wheel and Gwynnda data:
 ```{r message=FALSE, warning=FALSE}
 professor_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 2, skip = 1) |>
   janitor::clean_names() |>
-  drop_na()
+  head(-1) |>
+  mutate(across(everything(), ~replace_na(.x, 0)))
 professor_df
 gwynnda_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 4, skip = 1) |>
   janitor::clean_names() |>
-  drop_na()
+  head(-1) |>
+  mutate(across(everything(), ~replace_na(.x, 0)))
 gwynnda_df
 ```
 
@@ -89,9 +91,13 @@ mr_trash_wheel_df = mutate(mr_trash_wheel_df, type = 'mr', year = as.integer(yea
 professor_df = mutate(professor_df, type = 'professor', year = as.integer(year))
 gwynnda_df = mutate(gwynnda_df, type = 'gwynnda', year = as.integer(year))
 merge_df = bind_rows(mr_trash_wheel_df,professor_df,gwynnda_df) |>
-  arrange(dumpster)
+  arrange(date) |>
+  select(type,date,everything(),-dumpster)
 merge_df
 ```
+
+in total, the dataset has 1188 rows of 14 variables, including type showing the data comes from which wheel; date, month, year showing the time of data collected; weight_tons showing the weight of garbage which unit is ton; volume_cubic_yards showing the volume of garbage which unit is cubic yard; from plastic_bottles to sports_balls(total 7 columns) showing the amount of each type garbage; homes_powered showing the amount of homes powered by the electricity generated from garbage.     
+The total weight of trash collected by Professor Trash Wheel is `r sum(professor_df$weight_tons)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is `r sum(filter(gwynnda_df,month == 'June',year == 2022)$cigarette_butts)`. 
 
 
 
