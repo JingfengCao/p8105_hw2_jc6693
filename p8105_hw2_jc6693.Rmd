@@ -131,10 +131,35 @@ zillow_df = left_join(zori_df,zipcodes_df,by = c('zip_code','county')) |>
 zillow_df
 ```
 
-The final dataset is zillow_df, which has 10450 observations and 14 variables. It is arranged by first three columns which are zip_code,county,date, noticed that there are few zip codes like 10463 and 11201 having multiple counties. The fourth variable is ZORI value and each row represent an unique zip code in certain county in certain time. So in total we have 10450 ZORI values in the data frame. There are `r length(unique(zillow_df$zip_code))` unique ZIP codes are included, and `r length(unique(zillow_df$neighborhood))` unique neighborhoods.   
+The final dataset is zillow_df, which has 10450 observations and 14 variables. It is arranged by first three columns which are zip_code,county,date, noticed that there are few zip codes like 10463 and 11201 having multiple counties. The fourth variable is ZORI value and each row represent an unique zip code in certain county in certain time. So in total we have 10450 ZORI values in the data frame. There are `r length(unique(zillow_df$zip_code))` unique ZIP codes are included, and `r length(unique(zillow_df$neighborhood))` unique neighborhoods.  
 
+```{r}
+zipcodes_zipcode = unique(zipcodes_df$zip_code)
+zipcodes_zori = unique(zori_df$zip_code)
+missing_zipcodes = setdiff(zipcodes_zipcode,zipcodes_zori)
+missing_zipcodes
+```
+There are `r length(missing_zipcodes)` zip codes which appear in the ZIP code dataset but not in the Zillow Rental Price dataset.
+Some zip codes might be excluded because these place may not have home for rental. For example, 10041 is Wall street which is a business area, and 11430 is JFK airport. 
 
+```{r}
+pandemic_df = filter(zillow_df, date == '2020_01_31' | date == '2021_01_31') |>
+  pivot_wider(names_from = 'date', values_from = 'zori') |>
+  janitor::clean_names() |>
+  filter(!is.na(x2020_01_31)) |>
+  mutate(price_drop = x2021_01_31 - x2020_01_31, percentage = -price_drop*100/x2020_01_31) |>
+  select(price_drop,percentage,everything()) |>
+  arrange(price_drop)
+pandemic_df
+```
 
+```{r}
+library(knitr)
 
+table_temp = head(pandemic_df,n = 10) |>
+  select(1:5) |>
+  kable()
+table_temp
+```
 
-
+I think it's true that rental prices fluctuated dramatically during the COVID-19 pandemic. The drop in these zip codes are more than 600 and the drop percentages are more than 14%. Besides, these are all come from New York County. 
