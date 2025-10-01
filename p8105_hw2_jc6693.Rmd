@@ -65,11 +65,33 @@ import clean the Mr. Trash Wheel sheet
 mr_trash_wheel_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 1, skip = 1) |>
   select(-...15,-...16) |>
   janitor::clean_names() |>
+  head(-1) |>
   drop_na() |>
   mutate(sports_balls = as.integer(round(sports_balls)))
 mr_trash_wheel_df
 ```
 
+import Professor Trash Wheel and Gwynnda data:
+```{r message=FALSE, warning=FALSE}
+professor_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 2, skip = 1) |>
+  janitor::clean_names() |>
+  drop_na()
+professor_df
+gwynnda_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 4, skip = 1) |>
+  janitor::clean_names() |>
+  drop_na()
+gwynnda_df
+```
+
+join them:
+```{r}
+mr_trash_wheel_df = mutate(mr_trash_wheel_df, type = 'mr', year = as.integer(year))
+professor_df = mutate(professor_df, type = 'professor', year = as.integer(year))
+gwynnda_df = mutate(gwynnda_df, type = 'gwynnda', year = as.integer(year))
+merge_df = bind_rows(mr_trash_wheel_df,professor_df,gwynnda_df) |>
+  arrange(dumpster)
+merge_df
+```
 
 
 
