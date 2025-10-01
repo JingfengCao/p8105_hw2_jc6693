@@ -36,6 +36,15 @@ snp_df = read_csv('fivethirtyeight_datasets/snp.csv') |>
 ```
 
 import data unemployment
+```{r}
+unemployment_df = read_csv('fivethirtyeight_datasets/unemployment.csv') |>
+  pivot_longer(Jan:Dec,names_to = 'month',values_to = 'unemployment') |>
+  mutate(month = month.name[match(month, month.abb)]) |>
+  janitor::clean_names() |>
+  mutate(year = as.integer(year))
+```
+
+
 
 
 
