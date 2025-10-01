@@ -55,8 +55,8 @@ fivethirtyeight_df = left_join(pols_month_df,snp_df,by = c('year','month')) |>
 fivethirtyeight_df
 ```
 
-the pols_month dataset contains 822 lines and 9 columns related to the number of national politicians who are democratic or republican. snp dataset contains contains 787 lines and 3 columns related to the closing value of Standard & Poor’s stock market index (S&P). the umenployment dataset contains 816 lines and 3 columns related to the percentage of unemployment.   
-After merging, the result dataset contains 822 lines and 11 columns. the year ranges from 1947 to 2015, with some missing data of unemployment in 1947 and snp in 1947 to 1949. the key variables are year and month showing time; govgop:president(total 7 variables) showing the politicians; snp showing the stock's values; unemployment showing the unemployment rate.
+the pols_month dataset contains 822 rows and 9 columns related to the number of national politicians who are democratic or republican. snp dataset contains contains 787 rows and 3 columns related to the closing value of Standard & Poor’s stock market index (S&P). the umenployment dataset contains 816 rows and 3 columns related to the percentage of unemployment.   
+After merging, the result dataset contains 822 rows and 11 columns. the year ranges from 1947 to 2015, with some missing data of unemployment in 1947 and snp in 1947 to 1949. the key variables are year and month showing time; govgop:president(total 7 variables) showing the politicians; snp showing the stock's values; unemployment showing the unemployment rate.
 
 ## Problem 2
 
@@ -119,14 +119,19 @@ zori_df = read_csv('zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv') |>
   arrange(zip_code) |>
   pivot_longer(x2015_01_31:x2024_08_31,names_to = 'date', names_prefix = 'x', values_to = 'zori') |>
   drop_na() |>
-  select(zip_code,date,zori,everything())
+  mutate(county = str_replace(county_name, " County$", "")) |>
+  select(zip_code,county,date,zori,everything(),-state_name,-county_name)
 zori_df
 ```
 
 merge datasets
 ```{r}
-
+zillow_df = left_join(zori_df,zipcodes_df,by = c('zip_code','county')) |>
+  arrange(zip_code,county,date)
+zillow_df
 ```
+
+The final dataset is zillow_df, which has 10450 observations and 14 variables. It is arranged by first three columns which are zip_code,county,date, noticed that there are few zip codes like 10463 and 11201 having multiple counties. The fourth variable is ZORI value and each row represent an unique zip code in certain county in certain time. So in total we have 10450 ZORI values in the data frame. There are `r length(unique(zillow_df$zip_code))` unique ZIP codes are included, and `r length(unique(zillow_df$neighborhood))` unique neighborhoods.   
 
 
 
