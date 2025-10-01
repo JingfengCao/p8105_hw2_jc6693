@@ -99,9 +99,34 @@ merge_df
 in total, the dataset has 1188 rows of 14 variables, including type showing the data comes from which wheel; date, month, year showing the time of data collected; weight_tons showing the weight of garbage which unit is ton; volume_cubic_yards showing the volume of garbage which unit is cubic yard; from plastic_bottles to sports_balls(total 7 columns) showing the amount of each type garbage; homes_powered showing the amount of homes powered by the electricity generated from garbage.     
 The total weight of trash collected by Professor Trash Wheel is `r sum(professor_df$weight_tons)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is `r sum(filter(gwynnda_df,month == 'June',year == 2022)$cigarette_butts)`. 
 
+## Problem 3
 
+import data Zip Codes.csv
+```{r message=FALSE, warning=FALSE}
+zipcodes_df = read_csv('zillow_data/Zip Codes.csv') |>
+  janitor::clean_names() |>
+  arrange(zip_code) |>
+  select(zip_code,everything())
+zipcodes_df
+```
 
+import data Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv
+```{r message=FALSE, warning=FALSE}
+zori_df = read_csv('zillow_data/Zip_zori_uc_sfrcondomfr_sm_month_NYC.csv') |>
+  janitor::clean_names() |>
+  pivot_wider(names_from = 'region_type', values_from = 'region_name') |>
+  select(zip_code = zip,everything()) |>
+  arrange(zip_code) |>
+  pivot_longer(x2015_01_31:x2024_08_31,names_to = 'date', names_prefix = 'x', values_to = 'zori') |>
+  drop_na() |>
+  select(zip_code,date,zori,everything())
+zori_df
+```
 
+merge datasets
+```{r}
+
+```
 
 
 
