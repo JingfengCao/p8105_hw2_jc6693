@@ -13,7 +13,7 @@ library(haven)
 ```
 
 import data pols_month
-```{r}
+```{r message=FALSE, warning=FALSE}
 pols_month_df = read_csv('fivethirtyeight_datasets/pols-month.csv') |>
   janitor::clean_names() |>
   separate(mon,into = c('year','month','day'),sep = '-') |>
@@ -21,10 +21,11 @@ pols_month_df = read_csv('fivethirtyeight_datasets/pols-month.csv') |>
   mutate(month = lubridate::month(month,label = TRUE, abbr = FALSE)) |>
   mutate(president = case_when(prez_dem == 1 ~ 'dem', prez_gop == 1 ~ 'gop')) |>
   select(-prez_dem, -prez_gop, -day)
+pols_month_df
 ```
 
 import data snp
-```{r}
+```{r message=FALSE, warning=FALSE}
 snp_df = read_csv('fivethirtyeight_datasets/snp.csv') |>
   janitor::clean_names() |>
   separate(date,into = c('month','day','year'),sep = '/') |>
@@ -33,15 +34,17 @@ snp_df = read_csv('fivethirtyeight_datasets/snp.csv') |>
   arrange(year,month) |>
   mutate(month = lubridate::month(month,label = TRUE, abbr = FALSE)) |>
   select(year,month, everything(), -day)
+snp_df
 ```
 
 import data unemployment
-```{r}
+```{r message=FALSE, warning=FALSE}
 unemployment_df = read_csv('fivethirtyeight_datasets/unemployment.csv') |>
   pivot_longer(Jan:Dec,names_to = 'month',values_to = 'unemployment') |>
   mutate(month = month.name[match(month, month.abb)]) |>
   janitor::clean_names() |>
   mutate(year = as.integer(year))
+unemployment_df
 ```
 
 join and brief description
@@ -49,12 +52,28 @@ join and brief description
 ```{r}
 fivethirtyeight_df = left_join(pols_month_df,snp_df,by = c('year','month')) |>
   left_join(unemployment_df,by = c('year','month'))
+fivethirtyeight_df
 ```
 
 the pols_month dataset contains 822 lines and 9 columns related to the number of national politicians who are democratic or republican. snp dataset contains contains 787 lines and 3 columns related to the closing value of Standard & Poor’s stock market index (S&P). the umenployment dataset contains 816 lines and 3 columns related to the percentage of unemployment.   
 After merging, the result dataset contains 822 lines and 11 columns. the year ranges from 1947 to 2015, with some missing data of unemployment in 1947 and snp in 1947 to 1949. the key variables are year and month showing time; govgop:president(total 7 variables) showing the politicians; snp showing the stock's values; unemployment showing the unemployment rate.
 
 ## Problem 2
+
+import clean the Mr. Trash Wheel sheet
+```{r message=FALSE, warning=FALSE}
+mr_trash_wheel_df = read_excel('202509 Trash Wheel Collection Data.xlsx', sheet = 1, skip = 1) |>
+  select(-...15,-...16) |>
+  janitor::clean_names() |>
+  drop_na() |>
+  mutate(sports_balls = as.integer(round(sports_balls)))
+mr_trash_wheel_df
+```
+
+
+
+
+
 
 
 
